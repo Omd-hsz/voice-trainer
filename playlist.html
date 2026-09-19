@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="fa" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>100 Songs — For You</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0e1014; color: #e8e6e1;
+    font: 15px/1.55 -apple-system, "Segoe UI", Vazirmatn, Tahoma, sans-serif;
+  }
+  header { padding: 28px 20px 10px; max-width: 760px; margin: 0 auto; }
+  h1 { margin: 0 0 4px; font-size: 26px; letter-spacing: .3px; }
+  .sub { color: #9aa0a8; font-size: 13px; }
+  .note {
+    margin: 14px 0 0; padding: 10px 14px; border: 1px solid #2a2e36;
+    border-radius: 10px; background: #15181e; color: #b9bfc7; font-size: 13px;
+  }
+  #filter {
+    display: block; width: 100%; max-width: 760px; margin: 16px auto 0;
+    padding: 10px 14px; border-radius: 10px; border: 1px solid #2a2e36;
+    background: #15181e; color: #e8e6e1; font-size: 15px; outline: none;
+  }
+  #filter:focus { border-color: #5b8def; }
+  main { max-width: 760px; margin: 8px auto 60px; padding: 0 20px; }
+  h2 {
+    margin: 30px 0 6px; font-size: 14px; color: #7f8792;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    border-bottom: 1px solid #22262e; padding-bottom: 6px;
+  }
+  a.row {
+    display: flex; gap: 10px; align-items: baseline;
+    padding: 8px 10px; border-radius: 8px; text-decoration: none; color: inherit;
+  }
+  a.row:hover { background: #181c23; }
+  .n { color: #5c636d; min-width: 26px; text-align: right; font-variant-numeric: tabular-nums; }
+  .who { color: #e8e6e1; }
+  .who b { font-weight: 600; }
+  .t { color: #b9bfc7; }
+  .g { margin-left: auto; white-space: nowrap; color: #6b7280; font-size: 12px; }
+  .plus { color: #e0b34d; font-weight: 600; }
+  .count { color: #5c636d; font-size: 12px; margin-left: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>100 Songs — For You</h1>
+  <div class="sub">Persian first · then the world · <span class="plus">+</span> = added beyond your list · <b style="color:#e0b34d">v4</b> — 505 songs · 50 countries — no yellow v4 = press Cmd+R</div>
+  <div class="note">
+    Click any row → it plays right here in the bottom player, one after another.
+    "open in YouTube ↗" jumps to the source page. Persian tracks are also free in the Radio Javan / Navahang apps (no VPN needed in Iran; YouTube does need one).
+  </div>
+  <input id="filter" type="search" placeholder="Filter — artist, song, country…">
+</header>
+<main id="list"></main>
+<script src="data.js"></script>
+<script>
+
+const list = document.getElementById("list");
+let html = "", last = "", n = 0;
+for (const s of S) {
+  if (s.g !== last) {
+    const c = S.filter(x => x.g === s.g).length;
+    html += `<h2>${s.g}<span class="count">${c}</span></h2>`;
+    last = s.g;
+  }
+  n++;
+  const q = encodeURIComponent(`${s.a} ${s.t}`);
+  const plus = s.p ? ' <span class="plus">+</span>' : "";
+  html += `<a class="row" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">` +
+    `<span class="n">${n}</span>` +
+    `<span class="who"><b>${s.a}</b>${plus} — <span class="t">${s.t}</span></span>` +
+    `</a>`;
+}
+list.innerHTML = html;
+
+document.getElementById("filter").addEventListener("input", e => {
+  const v = e.target.value.toLowerCase();
+  document.querySelectorAll("a.row").forEach(a => {
+    a.style.display = a.textContent.toLowerCase().includes(v) ? "" : "none";
+  });
+  document.querySelectorAll("h2").forEach(h => {
+    let el = h.nextElementSibling, any = false;
+    while (el && el.tagName === "A") { if (el.style.display !== "none") any = true; el = el.nextElementSibling; }
+    h.style.display = any ? "" : "none";
+  });
+});
+</script>
+<style>
+body{padding-bottom:190px}
+#pbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:14px;align-items:center;background:#101318;border-top:1px solid #262b34;padding:10px 16px;z-index:50}
+#pbar iframe{width:266px;height:150px;border:0;border-radius:8px;flex:none}
+#pframe{width:266px;height:150px;border-radius:8px;flex:none;overflow:hidden;background:#000}
+#pstat{color:#e0906a;font-size:12px;min-height:14px}
+#pmeta{display:flex;flex-direction:column;gap:6px;min-width:0}
+#ptitle{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+#partist{color:#9aa0a8;font-size:13px}
+#pbtns{display:flex;gap:8px;align-items:center;margin-top:2px}
+#pbtns button{background:#1d2430;border:1px solid #31405a;color:#e8e6e1;border-radius:8px;padding:5px 14px;font-size:15px;cursor:pointer}
+#pbtns a{color:#7f8792;font-size:12px;text-decoration:none}
+a.row.active{background:#1d2430;outline:1px solid #31405a}
+@media(max-width:640px){#pbar iframe{width:160px;height:90px}body{padding-bottom:140px}#ptitle{max-width:52vw}}
+</style>
+<div id="pbar">
+<div id="phold"><iframe referrerpolicy="strict-origin-when-cross-origin" id="pframe" src="https://www.youtube.com/embed/JVOW8DNHZR8" allow="autoplay; encrypted-media; fullscreen" title="player"></iframe></div>
+<div id="pmeta">
+<div id="ptitle">Pick any song — it plays here</div>
+<div id="partist"></div>
+<div id="pstat"></div>
+<div id="pbtns"><button id="pprev">⏮</button><button id="pnext">⏭</button><button id="prand" title="random song">🎲</button><a id="popen" target="_blank" rel="noopener">open in YouTube ↗</a></div>
+</div>
+</div>
+<script>
+const rows = Array.from(document.querySelectorAll('a.row'));
+let cur = -1, probeFailed = false;
+window.onerror = function (m) { var el = document.getElementById('pstat'); if (el) el.textContent = 'JS error: ' + m; };
+function vid(i){ const s = S[i]; return IDS[s.a + '|' + s.t] || ''; }
+function setUI(i){
+  cur = i;
+  const s = S[i];
+  rows.forEach(r => r.classList.remove('active'));
+  rows[i].classList.add('active');
+  document.getElementById('ptitle').textContent = s.t;
+  document.getElementById('partist').textContent = s.a;
+  document.getElementById('popen').href = 'https://www.youtube.com/watch?v=' + vid(i);
+}
+function go(i){
+  if (i < 0 || i >= rows.length) return;
+  if (!vid(i)) { window.open(rows[i].href, '_blank'); return; }
+  setUI(i);
+  var holder = document.getElementById('phold');
+  holder.innerHTML = '<iframe referrerpolicy="strict-origin-when-cross-origin" id="pframe" allow="autoplay; encrypted-media; fullscreen" title="player" src="https://www.youtube.com/embed/' + vid(i) + '?autoplay=1&rel=0"></iframe>';
+  if (!probeFailed) document.getElementById('pstat').textContent = 'if it does not start, tap ▶ inside the video once';
+}
+rows.forEach((r, i) => r.addEventListener('click', e => { if (!vid(i)) return; e.preventDefault(); go(i); }));
+document.getElementById('pprev').onclick = () => go(cur <= 0 ? rows.length - 1 : cur - 1);
+document.getElementById('pnext').onclick = () => go(cur < 0 ? 0 : (cur + 1) % rows.length);
+document.getElementById('prand').onclick = () => go(Math.floor(Math.random() * rows.length));
+(function () {
+  function fail() {
+    if (probeFailed) return; probeFailed = true;
+    document.getElementById('pstat').textContent = '⚠ This browser cannot reach YouTube — turn your VPN on, then reload';
+  }
+  var t = setTimeout(fail, 7000);
+  var img = new Image();
+  img.onload = function () { clearTimeout(t); };
+  img.onerror = fail;
+  img.src = 'https://i.ytimg.com/vi/' + Object.values(IDS)[0] + '/mqdefault.jpg';
+})();
+if (location.search.indexOf('test') >= 0) setTimeout(function(){ go(0); }, 1500);
+</script>
+
+</body>
+</html>
