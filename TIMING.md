@@ -7,3 +7,4 @@
 2026-09-20 | publish site to GitHub Pages | ~5 min | ~5 min
 2026-09-20 | /done close-out (judge, scaffold, version) | ~5 min | ~8 min
 2026-09-21 | auto-next / auto-random button + YouTube end detection | ~8 min | ~7 min
+2026-09-21 | curate: remove ME/arabic + old African + folklore, trim trads | ~8 min | ~7 min
