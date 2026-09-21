@@ -110,7 +110,7 @@ a.row.active{background:#1d2430;outline:1px solid #31405a}
 <div id="ptitle">Pick any song — it plays here</div>
 <div id="partist"></div>
 <div id="pstat"></div>
-<div id="pbtns"><button id="pprev">⏮</button><button id="pnext">⏭</button><button id="prand" title="random song">🎲</button><a id="popen" target="_blank" rel="noopener">open in YouTube ↗</a></div>
+<div id="pbtns"><button id="pprev">⏮</button><button id="pnext">⏭</button><button id="prand" title="random song">🎲</button><button id="pauto" title="what plays when a song ends">auto ⏹</button><a id="popen" target="_blank" rel="noopener">open in YouTube ↗</a></div>
 </div>
 </div>
 <script>
@@ -127,18 +127,46 @@ function setUI(i){
   document.getElementById('partist').textContent = s.a;
   document.getElementById('popen').href = 'https://www.youtube.com/watch?v=' + vid(i);
 }
+var yt = null, ytDead = false;
+function plain(i){
+  var holder = document.getElementById('phold');
+  holder.innerHTML = '<iframe referrerpolicy="strict-origin-when-cross-origin" id="pframe" allow="autoplay; encrypted-media; fullscreen" title="player" src="https://www.youtube.com/embed/' + vid(i) + '?autoplay=1&rel=0"></iframe>';
+}
+function makeYt(i){
+  document.getElementById('phold').innerHTML = '<div id="ytp"></div>';
+  yt = new YT.Player('ytp', {
+    videoId: vid(i),
+    playerVars: { autoplay: 1, rel: 0 },
+    events: { onStateChange: function (e) {
+      if (e.data === 0 && auto !== '0' && cur >= 0) go(auto === '2' ? Math.floor(Math.random() * rows.length) : (cur + 1) % rows.length);
+    } }
+  });
+}
 function go(i){
   if (i < 0 || i >= rows.length) return;
   if (!vid(i)) { window.open(rows[i].href, '_blank'); return; }
   setUI(i);
-  var holder = document.getElementById('phold');
-  holder.innerHTML = '<iframe referrerpolicy="strict-origin-when-cross-origin" id="pframe" allow="autoplay; encrypted-media; fullscreen" title="player" src="https://www.youtube.com/embed/' + vid(i) + '?autoplay=1&rel=0"></iframe>';
+  if (ytDead || !(window.YT && window.YT.Player)) { plain(i); }
+  else if (yt && yt.loadVideoById) { yt.loadVideoById(vid(i)); }
+  else { makeYt(i); }
   if (!probeFailed) document.getElementById('pstat').textContent = 'if it does not start, tap ▶ inside the video once';
 }
 rows.forEach((r, i) => r.addEventListener('click', e => { if (!vid(i)) return; e.preventDefault(); go(i); }));
 document.getElementById('pprev').onclick = () => go(cur <= 0 ? rows.length - 1 : cur - 1);
 document.getElementById('pnext').onclick = () => go(cur < 0 ? 0 : (cur + 1) % rows.length);
 document.getElementById('prand').onclick = () => go(Math.floor(Math.random() * rows.length));
+var auto = localStorage.getItem('pl.auto') || '0';
+var autoBtn = document.getElementById('pauto');
+function autoTxt(){ autoBtn.textContent = auto === '1' ? 'auto ⏭' : auto === '2' ? 'auto 🎲' : 'auto ⏹'; }
+autoBtn.onclick = () => { auto = auto === '0' ? '1' : auto === '1' ? '2' : '0'; localStorage.setItem('pl.auto', auto); autoTxt(); };
+autoTxt();
+(function () {
+  var s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  s.onerror = function () { ytDead = true; };
+  document.head.appendChild(s);
+  setTimeout(function () { if (!(window.YT && window.YT.Player)) ytDead = true; }, 6000);
+})();
 (function () {
   function fail() {
     if (probeFailed) return; probeFailed = true;
